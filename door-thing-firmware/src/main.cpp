@@ -4,10 +4,10 @@
 // Door switch pin
 #define SWITCH_PIN 2
 
-BLEService switchService("180A"); // BLE Switch Service
+BLEService switchService("1811"); // BLE Switch Service
 
 // BLE Switch Characteristic - custom 128-bit UUID, read by central
-BLEByteCharacteristic switchCharacteristic("1234", BLERead | BLEIndicate);
+BLEByteCharacteristic switchCharacteristic("2AE2", BLERead | BLEIndicate);
 
 void setup()
 {
