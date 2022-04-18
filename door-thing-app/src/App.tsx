@@ -1,5 +1,6 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
+const doorServiceUUIDString = "0x1811";
 const doorServiceUUID: BluetoothServiceUUID = 0x1811;
 const doorSwitchUUID: BluetoothCharacteristicUUID = 0x2ae2;
 
@@ -11,49 +12,93 @@ export function App() {
     characteristic: BluetoothRemoteGATTCharacteristic;
   } | null>(null);
   const [doorOpen, setDoorOpen] = useState<boolean | null>(null);
+  const [autoConnect, setAutoConnect] = useState(false);
 
-  const onConnectClick = async () => {
-    try {
-      setConnecting(true);
-      const foundDevice = await navigator.bluetooth.requestDevice({
+  useEffect(() => {
+    window.api.send("read-setting", "autoConnect");
+    window.api.receive(
+      "read-setting-success",
+      (res: { key: string; value: any }) => {
+        if (res.key == "autoConnect") {
+          setAutoConnect(res.value);
+        }
+      },
+    );
+    window.api.receive(
+      "user-gesture-reply",
+      async (res: { type: string; promise: Promise<any> }) => {
+        if (res.type == "find-device") {
+          try {
+            const foundDevice = await window.newDevice;
+            console.log("Found device:");
+            console.log(foundDevice);
+
+            await foundDevice.gatt.connect();
+            foundDevice.ongattserverdisconnected = onDisconnect;
+
+            const doorService = await foundDevice.gatt.getPrimaryService(
+              doorServiceUUID,
+            );
+            const doorSwitch = await doorService.getCharacteristic(
+              doorSwitchUUID,
+            );
+            setDevice({
+              device: foundDevice,
+              service: doorService,
+              characteristic: doorSwitch,
+            });
+
+            const data = await (await doorSwitch.readValue()).getUint8(0);
+            setDoorOpen(Boolean(data));
+
+            doorSwitch.oncharacteristicvaluechanged = onDoorUpdate;
+            doorSwitch.startNotifications();
+          } catch (error) {
+            console.log("Error connecting:");
+            console.log(error);
+          } finally {
+            setConnecting(false);
+            window.newDevice = null;
+          }
+        }
+      },
+    );
+  }, []);
+
+  useEffect(() => {
+    if (autoConnect && !device && !connecting) {
+      tryConnect();
+    }
+  }, [autoConnect, device, connecting]);
+
+  function onAutoConnectChange(e: Event) {
+    const newVal = (e.currentTarget as any).checked;
+    setAutoConnect(newVal);
+    window.api.send("write-setting", { key: "autoConnect", value: newVal });
+  }
+
+  const tryConnect = async () => {
+    setConnecting(true);
+    //we actually need all this, because otherwise it gives "Must be handling a user gesture..." error
+    //and there doesn't seem to be a way to circumvent this yet
+    //todo: make this at least somewhat less ugly?
+    //similar issue: https://github.com/electron/electron/issues/27625
+    window.api.send("exec-user-gesture", {
+      type: "find-device",
+      function: `
+      window.newDevice = navigator.bluetooth.requestDevice({
         filters: [
           {
             namePrefix: "Nano",
           },
         ],
-        optionalServices: [doorServiceUUID],
-      });
-      console.log("Found device:");
-      console.log(foundDevice);
-
-      await foundDevice.gatt.connect();
-      foundDevice.ongattserverdisconnected = onDisconnect;
-
-      const doorService = await foundDevice.gatt.getPrimaryService(
-        doorServiceUUID,
-      );
-      const doorSwitch = await doorService.getCharacteristic(doorSwitchUUID);
-      setDevice({
-        device: foundDevice,
-        service: doorService,
-        characteristic: doorSwitch,
-      });
-
-      const data = await (await doorSwitch.readValue()).getUint8(0);
-      setDoorOpen(Boolean(data));
-
-      doorSwitch.oncharacteristicvaluechanged = onDoorUpdate;
-      doorSwitch.startNotifications();
-    } catch (error) {
-      console.log("Error connecting:");
-      console.log(error);
-    } finally {
-      setConnecting(false);
-    }
+        optionalServices: [${doorServiceUUIDString}],
+      })`,
+    });
   };
 
-  const onDoorUpdate = async (ev: Event) => {
-    const characteristic = ev.target as BluetoothRemoteGATTCharacteristic;
+  const onDoorUpdate = async (e: Event) => {
+    const characteristic = e.target as BluetoothRemoteGATTCharacteristic;
     const parsed = Boolean(await characteristic.value.getUint8(0));
     setDoorOpen(parsed);
     new Notification("Door update", { body: parsed ? "Open" : "Closed" });
@@ -76,9 +121,14 @@ export function App() {
 
   return (
     <div>
+      <input
+        onChange={onAutoConnectChange}
+        checked={autoConnect}
+        type="checkbox"
+      />
       {connecting && !device && <span>Trying to connect</span>}
       {device == null && !connecting && (
-        <button onClick={onConnectClick}>Connect</button>
+        <button onClick={tryConnect}>Connect</button>
       )}
       {device && (
         <>
