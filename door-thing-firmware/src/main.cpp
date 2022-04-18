@@ -81,5 +81,6 @@ void loop()
         // when the central disconnects, print it out:
         Serial.print(F("Disconnected from central: "));
         Serial.println(central.address());
+        digitalWrite(LED_BUILTIN, LOW); // turn on the LED to indicate the connection
     }
 }
