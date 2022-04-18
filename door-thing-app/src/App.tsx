@@ -84,7 +84,7 @@ export function App() {
         <>
           <span>connected</span>
           <button onClick={onDisconnectClick}>Disconnect</button>
-          <span>{doorOpen ? "open" : "closed"}</span>
+          {doorOpen != null && <span>{doorOpen ? "open" : "closed"}</span>}
         </>
       )}
     </div>
