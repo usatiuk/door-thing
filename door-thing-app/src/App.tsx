@@ -25,13 +25,13 @@ export function App() {
       });
       console.log("Found device:");
       console.log(foundDevice);
+
       await foundDevice.gatt.connect();
       foundDevice.ongattserverdisconnected = onDisconnect;
 
       const doorService = await foundDevice.gatt.getPrimaryService(
         doorServiceUUID,
       );
-
       const doorSwitch = await doorService.getCharacteristic(doorSwitchUUID);
       setDevice({
         device: foundDevice,
@@ -40,11 +40,10 @@ export function App() {
       });
 
       const data = await (await doorSwitch.readValue()).getUint8(0);
+      setDoorOpen(Boolean(data));
 
       doorSwitch.oncharacteristicvaluechanged = onDoorUpdate;
       doorSwitch.startNotifications();
-
-      setDoorOpen(Boolean(data));
     } catch (error) {
       console.log("Error connecting:");
       console.log(error);
@@ -62,6 +61,7 @@ export function App() {
 
   const onDisconnect = async () => {
     setDevice(null);
+    setDoorOpen(null);
   };
 
   const onDisconnectClick = async () => {
