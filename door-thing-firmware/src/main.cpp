@@ -58,6 +58,8 @@ void loop()
 
         // while the central is still connected to peripheral:
         bool oldState = digitalRead(SWITCH_PIN);
+        switchCharacteristic.writeValue(oldState);
+
         while (central.connected())
         {
             // read the switch state:
