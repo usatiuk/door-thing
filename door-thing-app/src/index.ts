@@ -6,7 +6,7 @@ interface ISettings {
   autoConnect: boolean;
 }
 
-const settingsPath = path.join(app.getPath("appData"), "settings.json");
+const settingsPath = path.join(app.getPath("userData"), "settings.json");
 const settings = new Low<ISettings>(new JSONFile(settingsPath));
 const settingsRead = false;
 
