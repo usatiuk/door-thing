@@ -120,23 +120,30 @@ export function App() {
   };
 
   return (
-    <div>
-      <input
-        onChange={onAutoConnectChange}
-        checked={autoConnect}
-        type="checkbox"
-      />
-      {connecting && !device && <span>Trying to connect</span>}
-      {device == null && !connecting && (
-        <button onClick={tryConnect}>Connect</button>
-      )}
-      {device && (
-        <>
-          <span>connected</span>
-          <button onClick={onDisconnectClick}>Disconnect</button>
-          {doorOpen != null && <span>{doorOpen ? "open" : "closed"}</span>}
-        </>
-      )}
+    <div class="connectionBar">
+      <div class="autoconnectSwitch">
+        Autoconnect:
+        <input
+          onChange={onAutoConnectChange}
+          checked={autoConnect}
+          type="checkbox"
+        />
+      </div>
+      <div class="connectionStatus">
+        {connecting && !device && <span>Trying to connect</span>}
+        {device == null && !connecting && (
+          <button onClick={tryConnect}>Connect</button>
+        )}
+        {device && (
+          <>
+            <span>Connected </span>
+            <button onClick={onDisconnectClick}>Disconnect</button>
+          </>
+        )}
+      </div>
+      <div>
+        {doorOpen != null && <span>Door: {doorOpen ? "open" : "closed"}</span>}
+      </div>
     </div>
   );
 }
