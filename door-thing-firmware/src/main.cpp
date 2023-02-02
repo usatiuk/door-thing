@@ -3,7 +3,7 @@
 
 // Door switch pin
 #define SWITCH_PIN 2
-
+const char *name = "Arduino";
 BLEService switchService("1811"); // BLE Switch Service
 
 // BLE Switch Characteristic - custom 128-bit UUID, read by central
@@ -25,7 +25,8 @@ void setup()
     pinMode(SWITCH_PIN, INPUT);
 
     // set advertised local name and service UUID:
-    BLE.setLocalName("Nano 33 BLE");
+    BLE.setDeviceName(name);
+    BLE.setLocalName(name);
     BLE.setAdvertisedService(switchService);
 
     // add the characteristic to the service

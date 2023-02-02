@@ -89,7 +89,7 @@ export function App() {
       window.newDevice = navigator.bluetooth.requestDevice({
         filters: [
           {
-            namePrefix: "Nano",
+            namePrefix: "Arduino",
           },
         ],
         optionalServices: [${doorServiceUUIDString}],

@@ -43,9 +43,9 @@
         }
       ],
       "plugins": [
-        [
-          "@electron-forge/plugin-webpack",
-          {
+        {
+          "name": "@electron-forge/plugin-webpack",
+          "config": {
             "mainConfig": "./webpack.main.config.js",
             "renderer": {
               "config": "./webpack.renderer.config.js",
@@ -61,35 +61,36 @@
               ]
             }
           }
-        ]
+        }
       ]
     }
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.63",
-    "@electron-forge/maker-deb": "^6.0.0-beta.63",
-    "@electron-forge/maker-rpm": "^6.0.0-beta.63",
-    "@electron-forge/maker-squirrel": "^6.0.0-beta.63",
-    "@electron-forge/maker-zip": "^6.0.0-beta.63",
-    "@electron-forge/plugin-webpack": "^6.0.0-beta.63",
-    "@types/web-bluetooth": "^0.0.14",
-    "@typescript-eslint/eslint-plugin": "^5.19.0",
-    "@typescript-eslint/parser": "^5.19.0",
-    "@vercel/webpack-asset-relocator-loader": "^1.7.0",
-    "css-loader": "^6.7.1",
-    "electron": "18.0.4",
-    "eslint": "^8.13.0",
-    "eslint-import-resolver-typescript": "^2.7.1",
-    "eslint-plugin-import": "^2.26.0",
-    "fork-ts-checker-webpack-plugin": "^6.5.1",
+    "@electron-forge/cli": "^6.0.4",
+    "@electron-forge/maker-deb": "^6.0.4",
+    "@electron-forge/maker-rpm": "^6.0.4",
+    "@electron-forge/maker-squirrel": "^6.0.4",
+    "@electron-forge/maker-zip": "^6.0.4",
+    "@electron-forge/plugin-webpack": "^6.0.4",
+    "@types/eslint": "^8.21.0",
+    "@typescript-eslint/eslint-plugin": "^5.50.0",
+    "@typescript-eslint/parser": "^5.50.0",
+    "@vercel/webpack-asset-relocator-loader": "^1.7.3",
+    "css-loader": "^6.7.3",
+    "electron": "22.2.0",
+    "eslint": "^8.33.0",
+    "eslint-import-resolver-typescript": "^3.5.3",
+    "eslint-plugin-import": "^2.27.5",
+    "fork-ts-checker-webpack-plugin": "^7.3.0",
     "node-loader": "^2.0.0",
-    "preact": "^10.7.1",
+    "preact": "^10.11.3",
     "style-loader": "^3.3.1",
-    "ts-loader": "^9.2.8",
-    "typescript": "~4.5.4"
+    "ts-loader": "^9.4.2",
+    "typescript": "~4.9.5"
   },
   "dependencies": {
+    "@types/web-bluetooth": "^0.0.16",
     "electron-squirrel-startup": "^1.0.0",
-    "lowdb": "^3.0.0"
+    "lowdb": "^5.0.5"
   }
 }
